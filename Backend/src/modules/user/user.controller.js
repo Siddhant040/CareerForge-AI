@@ -7,7 +7,8 @@ import { apiError } from "../../utils/Api-Error.js";
 
 const getCookieOptions = () => ({
   httpOnly: true,
-  secure: true,
+  secure: false,
+  sameSite: "lax",
 });
 
 const generateAccessAndRefreshTokens = async (userId) => {

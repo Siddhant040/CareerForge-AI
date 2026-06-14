@@ -29,6 +29,7 @@ app.use(cookieParser())
 import {errorHandler} from "./middleware/error.middleware.js"
 import healthCheckRoutes from "./modules/healthCheck/healthCheck.routes.js";
 import authRoutes from "./modules/user/user.routes.js"
+import interviewRoutes from "./modules/Interview/interviewReport.route.js"
 
 
 
@@ -37,6 +38,7 @@ import authRoutes from "./modules/user/user.routes.js"
 
 app.use("/api/v1/healthCheck", healthCheckRoutes)
 app.use("/api/v1/auth",authRoutes)
+app.use("/api/v1/interviewReport",interviewRoutes)
 app.use(errorHandler)
 
 

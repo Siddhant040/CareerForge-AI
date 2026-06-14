@@ -1,4 +1,4 @@
 # Dependencies
 Backend/node_modules/
 # Environment variables
-Backend/src/.env
+Backend/.env
