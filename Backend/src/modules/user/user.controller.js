@@ -6,9 +6,9 @@ import jwt from "jsonwebtoken";
 import { apiError } from "../../utils/Api-Error.js";
 
 const getCookieOptions = () => ({
-  httpOnly: true,
-  secure: false,
-  sameSite: "lax",
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
 });
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -85,6 +85,12 @@ const login = asyncHandler(async (req, res) => {
 
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
+    const decoded = jwt.decode(accessToken);
+
+    console.log(decoded);
+    console.log(
+        new Date(decoded.exp * 1000)
+    );
 
     const createdUser = await User.findById(user._id).select(
         "-password  -refreshToken"
@@ -109,25 +115,25 @@ const login = asyncHandler(async (req, res) => {
  */
 
 const logout = asyncHandler(async (req, res) => {
-        const  accessToken = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-        const refreshToken = req.cookies?.refreshToken || req.header("Authorization")?.replace("Bearer ", "");  
+    const accessToken = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+    const refreshToken = req.cookies?.refreshToken || req.header("Authorization")?.replace("Bearer ", "");
 
-        if (!accessToken || !refreshToken) {
-                throw new apiError(400, "Access token and refresh token are required");
-        }
+    if (!accessToken || !refreshToken) {
+        throw new apiError(400, "Access token and refresh token are required");
+    }
 
-        await User.findOneAndUpdate(
-                { refreshToken },
-                { $unset: { refreshToken: 1 } }
-        );
+    await User.findOneAndUpdate(
+        { refreshToken },
+        { $unset: { refreshToken: 1 } }
+    );
 
-        // decode token to get expiry (use decode so we can read exp even if token expired)
-        const decoded = jwt.decode(accessToken);
+    // decode token to get expiry (use decode so we can read exp even if token expired)
+    const decoded = jwt.decode(accessToken);
 
-        await BlacklistedToken.create({
-                token: accessToken,
-                expiresAt: new Date((decoded?.exp || 0) * 1000),
-        });
+    await BlacklistedToken.create({
+        token: accessToken,
+        expiresAt: new Date((decoded?.exp || 0) * 1000),
+    });
 
     return res
         .clearCookie("accessToken", getCookieOptions())
@@ -143,10 +149,42 @@ const getUser = asyncHandler(async (req, res) => {
         .json(new apiResponse(200, { user }, "User found"));
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+   
+    const refreshToken = req.cookies?.refreshToken || req.header("Authorization")?.replace("Bearer ", "");
+    if (!refreshToken) {
+        throw new apiError(400, "Refresh token is required");
+    }
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+        throw new apiError(404, "User not found");
+    }
+    if (user.refreshToken !== refreshToken) {
+        throw new apiError(401, "Invalid refresh token");
+    }
+    const accessToken = jwt.sign(
+        {
+            id: decoded.id,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+        }
+    );
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, getCookieOptions())
+        .json(new apiResponse(200, { accessToken }, "Access token refreshed"));
+})
+
 export {
     register,
     login,
     logout,
-    getUser
+    getUser,
+    refreshAccessToken
 }
 

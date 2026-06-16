@@ -1,9 +1,10 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/checkAuth";
+import { AuthContext } from "@/contexts/auth.context";
 
 const ProtectedRoute = ({ children }) => {
-  const { user,loading } = useAuth();
-  if(loading) {
+  const { user,isCheckingAuth } = useAuth();
+  if(isCheckingAuth){ 
     return (
       <div className="flex min-h-screen items-center justify-center bg-black">
         <div className="text-center">

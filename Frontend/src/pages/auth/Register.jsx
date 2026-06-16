@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/checkAuth";
 
 export default function Register() {
-    const {handleRegister,loading} = useAuth();
+    const {handleRegister,registerLoading} = useAuth();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -111,9 +111,9 @@ export default function Register() {
 
                 <Button 
                                         type="submit"
-                                        disabled={loading}
+                                        disabled={registerLoading}
                                         className="w-full bg-rose-600 hover:bg-rose-700">
-                                            {loading ? (
+                                            {registerLoading? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                 Regitering...

@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/checkAuth";
 export default function Login() {
     const navigate = useNavigate();
 
-    const {handleLogin,loading} = useAuth();
+    const {handleLogin,loginLoading} = useAuth();
 
     const [formData, setFormData] = useState({
         email: "",
@@ -112,9 +112,9 @@ export default function Login() {
 
                         <Button 
                         type="submit"
-                        disabled={loading}
+                        disabled={loginLoading}
                         className="w-full bg-rose-600 hover:bg-rose-700">
-                            {loading ? (
+                            {loginLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 Logging in...
@@ -124,8 +124,11 @@ export default function Login() {
                                 "Login"
                             )}  
                         </Button>
+                        
 
-                        <p className="text-center text-sm text-zinc-400">
+                        <p
+                         onClick={() => navigate("/register")}
+                         className="text-center text-sm text-zinc-400">
                             Don't have an account?{" "}
                             <span className="text-rose-500 hover:text-rose-400 cursor-pointer">
                                 Register
