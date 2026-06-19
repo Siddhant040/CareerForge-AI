@@ -56,7 +56,7 @@ const createInterviewReport = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new apiResponse(200, "Report created successfully", report));
+        new apiResponse(200,report, "Report created successfully" ));
 
 
 });
@@ -72,7 +72,7 @@ const getInterviewReportById = asyncHandler(async(req,res)=>{
     return res
     .status(200)
     .json(
-        new apiResponse(200, "Report found successfully", report));
+        new apiResponse(200, report, "Report found successfully"));
 })
 
 /**
@@ -87,6 +87,22 @@ const getAllInterviewReports = asyncHandler(async(req,res)=>{
     return res
     .status(200)
     .json(
-        new apiResponse(200, "Report found successfully", report));
+        new apiResponse(200, report, "Reports found successfully"));
 })
-export { createInterviewReport, getInterviewReportById, getAllInterviewReports };
+
+/**
+ * @description to delete the report 
+ * 
+ */
+
+const deleteReport = asyncHandler(async(req,res)=>{
+    const report = await Report.findByIdAndDelete(req.params.id);
+    if(!report){
+        throw new apiError(404, "Report not found");
+    }
+    return res
+    .status(200)
+    .json(
+        new apiResponse(200, report, "Report deleted successfully"));
+})
+export { createInterviewReport, getInterviewReportById, getAllInterviewReports,deleteReport };

@@ -1,6 +1,6 @@
 import Login from "../pages/auth/Login.jsx";
 import Register from "../pages/auth/Register.jsx";
-import Home from "@/pages/interview/Home.jsx";
+import Home from "@/pages/Home.jsx";
 import Dashboard from "@/pages/interview/Dashboard.jsx";
 import Report from "@/pages/interview/Report.jsx";
 import { Routes, Route } from "react-router-dom";
@@ -20,7 +20,7 @@ function AppRoutes() {
                 }
             />
             <Route
-                path="/report"
+                path="/interviewReport/:id"
                 element={
                     <ProtectedRoute>
                         <Report />

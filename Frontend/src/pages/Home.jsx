@@ -3,7 +3,7 @@
       import { FileText, Brain, Briefcase, ArrowRight } from "lucide-react";
       import { useNavigate } from "react-router-dom";
       import { useContext } from "react";
-      import { AuthContext } from "../../contexts/auth.context";
+      import { AuthContext } from "../contexts/auth.context";
 
       export default function HomePage() {
         const navigate = useNavigate();

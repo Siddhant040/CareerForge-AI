@@ -1,10 +1,24 @@
+import React from 'react'
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import {
   Code2,
   MessageSquare,
   Map,
   Download,
-  ChevronDown,
+  User,
+  LogOut,
+  Loader2,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/checkAuth";
+
+import { useInterview } from "@/hooks/checkinterview";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 import {
   Accordion,
@@ -13,266 +27,418 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+function Report() {
+  const { id } = useParams();
 
-export default function InterviewPage() {
-  const score = 82;
+  const {
+    interview, getReportByIdloading, handleGetInterviewReportById, } = useInterview();
+
+  const [activeTab, setActiveTab] =
+    useState("technical");
+
+  useEffect(() => {
+    if (id) {
+      handleGetInterviewReportById(id);
+    }
+  }, [id]);
+
+  const navigate = useNavigate();
+  const { user, handleLogout, logoutLoading } = useAuth();
+
+  const LoggingOut = async () => {
+    try {
+      const response = await handleLogout();
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+
+  if (!interview) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-black text-white">
+        Report Not Found
+      </div>
+    );
+  }
+ 
+
+  const techQuestions =
+    interview?.technicalQuestions ?? [];
+
+  const behavioralQuestions =
+    interview?.behavioralQuestions ?? [];
+
+  const skillGaps =
+    interview?.skillGaps ?? [];
+
+  const score =
+    interview?.matchScore ?? 0;
+
   const scoreText =
     score >= 85
       ? "Excellent match for this role"
       : score >= 70
-      ? "Strong match for this role"
-      : score >= 50
-      ? "Moderate match — consider upskilling"
-      : "Low match — focus on key skill gaps";
+        ? "Strong match for this role"
+        : score >= 50
+          ? "Moderate match — consider upskilling"
+          : "Low match — focus on key skill gaps";
   return (
-    <div className="h-screen bg-black text-white overflow-hidden">
-      <div className="w-full h-full mx-auto max-w-7xl p-6">
+    <div className="min-h-screen bg-[#060b14] text-white p-2">
+      {/* Header (same as Dashboard) */}
+      <div className="border-b border-rose-500/20">
+        <div className="container mx-auto px-6   flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Career<span className="text-rose-500">Forge</span> AI
+            </h1>
 
-        {/* Main Layout */}
-        <div className="grid h-full overflow-hidden rounded-3xl border border-rose-500/20 bg-zinc-950 lg:grid-cols-[240px_1fr_280px]">
+            <p className="mt-1 text-gray-400">
+              Generate personalized interview reports powered by AI.
+            </p>
+          </div>
 
-          {/* Sidebar */}
-          <aside className="border-r border-rose-500/20 p-6 flex flex-col justify-between overflow-hidden">
+          <div className="flex gap-4">
+            {user ? (
+              <>
+                <Button variant="ghost" onClick={() => navigate("/profile")}> 
+                  <User className=" h-4 w-4" />
+                  Profile
+                </Button>
 
-            <div>
-              <p className="mb-6 text-xs uppercase tracking-[0.3em] text-zinc-500">
-                Sections
-              </p>
+                <Button
+                  disabled={logoutLoading}
+                  className="bg-rose-500 hover:bg-rose-600"
+                  onClick={LoggingOut}
+                >
+                  {logoutLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Logging out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </>
+                  )}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={() => navigate("/login")} variant="ghost">
+                  Login
+                </Button>
+                <Button onClick={() => navigate("/register")} className="bg-rose-500 hover:bg-rose-600">
+                  Get Started
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
-              <div className="space-y-3">
+      <div className="mx-auto mt-3 flex h-[88vh] max-w-7xl overflow-hidden rounded-3xl border border-slate-800 bg-black shadow-2xl">
 
-                <button className="flex w-full items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-rose-400">
-                  <span className="w-6 flex items-center justify-center">
-                    <Code2 size={18} />
-                  </span>
-                  <span className="flex-1 text-left">Technical Questions</span>
-                </button>
+        {/* LEFT SIDEBAR */}
+        <aside className="flex w-64 flex-col justify-between border-r border-slate-800 bg-black p-6">
 
-                <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-zinc-400 hover:bg-white/5">
-                  <span className="w-6 flex items-center justify-center">
-                    <MessageSquare size={18} />
-                  </span>
-                  <span className="flex-1 text-left">Behavioral Questions</span>
-                </button>
-
-                <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-zinc-400 hover:bg-white/5">
-                  <span className="w-6 flex items-center justify-center">
-                    <Map size={18} />
-                  </span>
-                  <span className="flex-1 text-left">Road Map</span>
-                </button>
-
-              </div>
-            </div>
-
-            <Button className="h-14 rounded-xl bg-rose-600 hover:bg-rose-700">
-              <Download className="mr-2 h-4 w-4" />
-              Download AI Resume
-            </Button>
-
-          </aside>
-
-          {/* Content */}
-          <main className="p-8 flex flex-col">
-
-            <div className="mb-8 flex items-center justify-between">
-
-              <div>
-                <h2 className="text-4xl font-bold leading-none">
-                  Technical
-                  <br />
-                  Questions
-                </h2>
-              </div>
-
-              <div className="rounded-2xl border border-rose-500/20 px-5 py-3 bg-zinc-900">
-                <span className="text-3xl font-bold">3</span>
-                <p className="text-sm text-zinc-400">
-                  questions
-                </p>
-              </div>
-
-            </div>
-
-            <div className="flex-1 overflow-auto">
-              <Accordion
-                type="single"
-                collapsible
-                className="space-y-4"
-              >
-
-              <AccordionItem
-                value="q1"
-                className="rounded-2xl border border-rose-500/20 bg-zinc-900 px-5"
-              >
-                <AccordionTrigger className="hover:no-underline">
-
-                  <div className="flex items-start gap-4 text-left">
-
-                    <span className="rounded-md bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-400">
-                      Q1
-                    </span>
-
-                    <span className="max-w-xl font-medium">
-                      Can you explain how you optimized MongoDB queries
-                      using aggregation pipelines and indexing?
-                    </span>
-
-                  </div>
-
-                </AccordionTrigger>
-
-                <AccordionContent>
-
-                  <div className="pt-4 space-y-6">
-
-                    <div>
-                      <h4 className="mb-2 text-sm font-semibold text-rose-400">
-                        Intention
-                      </h4>
-
-                      <p className="text-zinc-400">
-                        Tests database optimization knowledge.
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="mb-2 text-sm font-semibold text-emerald-400">
-                        Model Answer
-                      </h4>
-
-                      <p className="text-zinc-400">
-                        Discuss compound indexes, aggregation stages,
-                        explain plans, query profiling and performance monitoring.
-                      </p>
-                    </div>
-
-                  </div>
-
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem
-                value="q2"
-                className="rounded-2xl border border-rose-500/20 bg-zinc-900 px-5"
-              >
-                <AccordionTrigger className="hover:no-underline">
-
-                  <div className="flex items-start gap-4">
-
-                    <span className="rounded-md bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-400">
-                      Q2
-                    </span>
-
-                    <span>
-                      Explain React reconciliation process.
-                    </span>
-
-                  </div>
-
-                </AccordionTrigger>
-
-                <AccordionContent>
-                  <p className="text-zinc-400">
-                    Answer content goes here...
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem
-                value="q3"
-                className="rounded-2xl border border-rose-500/20 bg-zinc-900 px-5"
-              >
-                <AccordionTrigger className="hover:no-underline">
-
-                  <div className="flex items-start gap-4">
-
-                    <span className="rounded-md bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-400">
-                      Q3
-                    </span>
-
-                    <span>
-                      What are database transactions?
-                    </span>
-
-                  </div>
-
-                </AccordionTrigger>
-
-                <AccordionContent>
-                  <p className="text-zinc-400">
-                    Answer content goes here...
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-
-              </Accordion>
-            </div>
-
-          </main>
-
-          {/* Right Sidebar */}
-          <aside className="border-l border-rose-500/20 p-6 overflow-hidden">
-
-            <p className="mb-6 text-xs uppercase tracking-[0.3em] text-zinc-500">
-              Match Score
+          <div>
+            <p className="mb-6 text-xs uppercase tracking-[0.25em] text-zinc-500">
+              Sections
             </p>
 
-            <Card className="border-rose-500/20 bg-zinc-900 p-8">
+            <div className="space-y-3">
 
-              <div className="flex justify-center">
+              <button
+                onClick={() => setActiveTab("technical")}
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${activeTab === "technical"
+                  ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                  : "text-zinc-400 hover:bg-zinc-900"
+                  }`}
+              >
+                <Code2 size={18} />
+                <span>Technical Questions</span>
+              </button>
 
-                <div className="flex h-36 w-36 items-center justify-center rounded-full border-[8px] border-emerald-500">
+              <button
+                onClick={() => setActiveTab("behavioral")}
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${activeTab === "behavioral"
+                  ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                  : "text-zinc-400 hover:bg-zinc-900"
+                  }`}
+              >
+                <MessageSquare size={18} />
+                <span>Behavioral Questions</span>
+              </button>
 
-                  <div className="text-center">
-                    <div className="text-5xl font-bold">
-                      {score}
-                    </div>
-
-                    <div className="text-zinc-400">
-                      %
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-
-              <p className="mt-5 text-center text-emerald-400">{scoreText}</p>
-
-            </Card>
-
-                <div className="mt-8">
-
-              <p className="mb-4 text-xs uppercase tracking-[0.3em] text-zinc-500">
-                Skill Gaps
-              </p>
-
-              <div className="space-y-3">
-
-                <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs">
-                  Relational Databases (SQL)
-                </div>
-
-                <div className="rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs">
-                  Python / Django
-                </div>
-
-                <div className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs">
-                  Docker / Kubernetes
-                </div>
-
-              </div>
+              <button
+                onClick={() => setActiveTab("roadmap")}
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${activeTab === "roadmap"
+                  ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                  : "text-zinc-400 hover:bg-zinc-900"
+                  }`}
+              >
+                <Map size={18} />
+                <span>Preparation Roadmap</span>
+              </button>
 
             </div>
+          </div>
 
-          </aside>
+          <Button className="bg-rose-600 hover:bg-rose-700">
+            <Download className="mr-2 h-4 w-4" />
+            Download Resume
+          </Button>
+        </aside>
 
-        </div>
+        {/* CENTER CONTENT */}
+        <main className="flex-1 bg-black p-8">
+          <div className="flex flex-col h-full">
+            <Card className="mb-6 border-slate-700 bg-[#111827] p-6">
+  <div className="flex items-center justify-between">
+
+    <div>
+      <h1 className="text-3xl text-blue-500 font-bold">
+        {interview?.title || "AI Interview Report"}
+      </h1>
+
+      <p className="mt-2 text-white">
+        Personalized Interview Preparation Report
+      </p>
+    </div>
+
+    <div className="flex gap-3">
+
+      <Badge className="bg-rose-500 px-4 py-4 text-base font-semibold">
+        {techQuestions.length} Technical
+      </Badge>
+
+      <Badge className="bg-rose-400 px-4 py-4 text-base font-semibold">
+        {behavioralQuestions.length} Behavioral
+      </Badge>
+
+      <Badge className="bg-rose-300 px-4 py-4 text-base font-semibold">
+        {skillGaps.length} Gaps
+      </Badge>
+
+    </div>
+
+  </div>
+</Card>
+
+         
+            {/* Scrollable content: keep header fixed and only this div scrolls */}
+            <div className="mt-6 overflow-y-auto hide-scrollbar space-y-4 flex-1 pr-2">
+              {/* TECHNICAL QUESTIONS (collapsible) */}
+              {activeTab === "technical" && (
+                <Accordion type="single" collapsible className="space-y-4">
+                  {techQuestions.map((q, idx) => (
+                    <Card key={idx} className="border border-slate-700 bg-[#172033]">
+                      <AccordionItem value={`tech-${idx}`} className="border-none">
+                        <AccordionTrigger className="px-5">
+                          <div className="flex items-center gap-3 text-white text-left w-full">
+                            <span className="rounded-md border border-pink-500/20 bg-pink-500/10 px-2 py-1 text-xs font-semibold text-pink-400">
+                              Q{idx + 1}
+                            </span>
+                            <span className="flex-1">{q.question}</span>
+                          </div>
+                        </AccordionTrigger>
+
+                        <AccordionContent className="px-5 pb-5">
+                          <div className="mt-3 space-y-5">
+                            <div>
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-violet-400">Intention</p>
+                              <p className="text-slate-400">{q.intention}</p>
+                            </div>
+
+                            <div>
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-400">Model Answer</p>
+                              <p className="text-slate-400">{q.answer}</p>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Card>
+                  ))}
+                </Accordion>
+              )}
+
+          {/* BEHAVIORAL QUESTIONS */}
+          {activeTab === "behavioral" && (
+            <Accordion
+              type="single"
+              collapsible
+              className="space-y-4"
+            >
+              {behavioralQuestions.map((q, idx) => (
+                <Card
+                  key={idx}
+                  className="border-rose-500/20 bg-zinc-900"
+                >
+                  <AccordionItem
+                    value={`behavior-${idx}`}
+                    className="border-none"
+                  >
+                    <AccordionTrigger className="px-5">
+                      <div className="flex items-center gap-3 text-white text-left">
+                        <span className="rounded-md border border-pink-500/20 bg-pink-500/10 px-2 py-1 text-xs font-semibold text-pink-400">
+                          Q{idx + 1}
+                        </span>
+
+                        <span>{q.question}</span>
+                      </div>
+                    </AccordionTrigger>
+
+                    <AccordionContent className="px-5 pb-5">
+                      <div className="space-y-5">
+
+                        <div>
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-violet-400">
+                            Intention
+                          </p>
+
+                          <p className="text-zinc-400">
+                            {q.intention}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-400">
+                            Model Answer
+                          </p>
+
+                          <p className="text-zinc-400">
+                            {q.answer}
+                          </p>
+                        </div>
+
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Card>
+              ))}
+            </Accordion>
+          )}
+
+          {/* ROADMAP */}
+          {activeTab === "roadmap" && (
+            <div className="relative pl-10">
+
+              <div className="absolute left-3 top-0 bottom-0 w-px bg-rose-500/30" />
+
+              {interview?.preparationPlan?.map((day) => (
+                <div
+                  key={day.day}
+                  className="relative mb-8"
+                >
+                  <div className="absolute -left-8 top-2 h-4 w-4 rounded-full border-2 border-rose-500 bg-zinc-950" />
+
+                  <Card className="border-rose-500/20 bg-zinc-900 p-5">
+
+                    <Badge
+                      variant="outline"
+                      className="text-white bg-rose-500 border-rose-500/20"
+                    >
+                      Day {day.day}
+                    </Badge>
+
+                    <h3 className="mt- text-white text-lg font-semibold">
+                      {day.focus}
+                    </h3>
+
+                    <ul className="mt-4 space-y-2">
+                      {day.tasks.map((task, idx) => (
+                        <li
+                          key={idx}
+                          className="flex gap-2 text-zinc-400"
+                        >
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-500" />
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
+
+                  </Card>
+                </div>
+              ))}
+            </div>
+          )}
+            </div>
+          </div>
+        </main>
+
+        {/* RIGHT SIDEBAR */}
+        <aside className="w-80 border-l border-slate-800 bg-black p-6">
+
+          <p className="mb-4 text-xs uppercase tracking-[0.25em] text-zinc-500">
+            Match Score
+          </p>
+
+          <Card className="border-rose-500/20 bg-[#060b14] p-6">
+
+            <div
+              className="mx-auto flex h-36 w-36 items-center justify-center rounded-full"
+              style={{
+                background: `conic-gradient(
+                        #22c55e ${score * 3.6}deg,
+                                #1f2937 0deg
+                                  )`,
+              }}
+            >
+              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#111827]">
+                <div className="text-center text-white">
+                  <div className="text-5xl font-bold">
+                    {score}
+                  </div>
+
+                  <div className="text-slate-400">
+                    %
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p className="mt-4 text-center text-emerald-400">
+              {scoreText}
+            </p>
+
+          </Card>
+
+          <div className="mt-8">
+
+            <p className="mb-4 text-xs uppercase tracking-[0.25em] text-zinc-500">
+              Skill Gaps
+            </p>
+
+            <div className="space-y-3">
+              {skillGaps.map((gap, idx) => (
+                <div
+                  key={idx}
+                  className={`
+      rounded-lg border p-3 text-sm font-medium
+      ${gap.severity === "high"
+                      ? "border-red-500/20 bg-red-500/10 text-red-300"
+                      : gap.severity === "medium"
+                        ? "border-yellow-500/20 bg-yellow-500/10 text-yellow-300"
+                        : "border-green-500/20 bg-green-500/10 text-green-300"
+                    }
+      `}
+                >
+                  {gap.skill}
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+        </aside>
 
       </div>
     </div>
-  );
+  )
 }
+
+export default Report

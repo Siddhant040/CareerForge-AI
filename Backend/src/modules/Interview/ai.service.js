@@ -254,33 +254,61 @@ No explanations.
 }
 
 export async function main() {
-  const response = await generateInterviewReport({ resume, jobDescription, selfDescription });
+  const maxAttempts = 3;
+  let lastError = null;
 
-  const content =
-    response.choices[0]?.message?.content;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await generateInterviewReport({ resume, jobDescription, selfDescription });
 
-  console.log(content);
-  let jsonData;
+      const content = response.choices[0]?.message?.content;
+      console.log(`AI raw content (attempt ${attempt}):`, content);
 
-try {
-  jsonData = JSON.parse(content);
-} catch (error) {
-  console.error("Invalid JSON returned by AI");
-  throw new Error("AI returned malformed JSON");
-}
-  
-  const parsed = interviewReportSchema.safeParse(jsonData);
+      let jsonData;
+      try {
+        jsonData = JSON.parse(content);
+      } catch (err) {
+        console.warn(`Attempt ${attempt}: AI returned invalid JSON`);
+        throw new Error("AI returned malformed JSON");
+      }
 
-  if (!parsed.success) {
-  console.error(parsed.error.format());
+      const parsed = interviewReportSchema.safeParse(jsonData);
+      if (!parsed.success) {
+        console.warn(`Attempt ${attempt}: AI response failed schema validation`);
+        console.warn(parsed.error.format());
+        throw new Error("Invalid AI response");
+      }
 
-  throw new Error("Invalid AI response");
-}
-  console.log(
-    parsed.data
-  );
+      // Check for clearly-empty/placeholder outputs and retry if found.
+      const { matchScore, technicalQuestions, behavioralQuestions, skillGaps, title } = parsed.data;
+      const looksEmpty =
+        (typeof matchScore === "number" && matchScore === 0) &&
+        Array.isArray(technicalQuestions) && technicalQuestions.length === 0 &&
+        Array.isArray(behavioralQuestions) && behavioralQuestions.length === 0 &&
+        Array.isArray(skillGaps) && skillGaps.length === 0 &&
+        (!title || title.toLowerCase() === "unknown");
 
-  return parsed.data;
+      if (looksEmpty) {
+        console.warn(`Attempt ${attempt}: AI returned an empty/placeholder report`);
+        throw new Error("AI generated an empty report");
+      }
+
+      // success
+      console.log("Validated AI report:", parsed.data);
+      return parsed.data;
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts) {
+        console.log(`Retrying AI generation (attempt ${attempt + 1}/${maxAttempts})...`);
+        // small backoff
+        await new Promise((r) => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+    }
+  }
+
+  console.error("AI generation failed after retries:", lastError);
+  throw new Error(`AI generation failed: ${lastError?.message || "unknown error"}`);
 
 
 }
