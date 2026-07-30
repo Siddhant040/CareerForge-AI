@@ -1,6 +1,5 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../hooks/checkAuth";
-import { AuthContext } from "@/contexts/auth.context";
 
 const ProtectedRoute = ({ children }) => {
   const { user,isCheckingAuth } = useAuth();

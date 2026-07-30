@@ -2,16 +2,28 @@ import express from "express";
 const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser"
+import dotenv from "dotenv";
+dotenv.config()
 
 
 
-const allowedOrigin = process.env.URL?.replace(/\/$/, "") || "http://localhost:5173";
+const allowedOrigins = process.env.URLS.split(",").map(origin => origin.trim());
+
 const corsOptions = {
-    origin: allowedOrigin,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
+
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
+
+app.use(cors(corsOptions));
 
 //middleware configuration
 

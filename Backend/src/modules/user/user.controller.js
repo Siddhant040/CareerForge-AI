@@ -1,7 +1,7 @@
+import jwt from "jsonwebtoken";
 import { apiResponse } from "../../utils/Api-Response.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { User, BlacklistedToken } from "./user.model.js";
-import jwt from "jsonwebtoken";
+import { BlacklistedToken, User } from "./user.model.js";
 
 import { apiError } from "../../utils/Api-Error.js";
 
@@ -21,7 +21,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
         return { accessToken, refreshToken };
 
     } catch (error) {
-        throw new apiError(500, "Error generating tokens");
+        throw new apiError(500, "Error generating tokens", error);
     }
 }
 
@@ -85,12 +85,10 @@ const login = asyncHandler(async (req, res) => {
 
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
-    const decoded = jwt.decode(accessToken);
+  
 
-    console.log(decoded);
-    console.log(
-        new Date(decoded.exp * 1000)
-    );
+    
+   
 
     const createdUser = await User.findById(user._id).select(
         "-password  -refreshToken"
@@ -181,10 +179,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 export {
-    register,
-    login,
-    logout,
-    getUser,
-    refreshAccessToken
-}
+    getUser, login,
+    logout, refreshAccessToken, register
+};
 

@@ -16,20 +16,19 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.data.user);
             } catch {
                 try {
-                    console.log("Trying refresh token...");
+                   
                     await refreshAccessToken();
 
                     const response = await getUser();
                     setUser(response.data.user);
-                    console.log("User restored after refresh");
+                    
 
 
-                } catch (error) {
-                    console.log("Full refresh error:", error);
-                    console.log("Status:", error.response?.status);
-                    console.log("Data:", error.response?.data);
+                } catch  {
+                   
 
                     setUser(null);
+
                 }
 
             }

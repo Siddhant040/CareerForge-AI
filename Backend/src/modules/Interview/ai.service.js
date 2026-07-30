@@ -3,13 +3,12 @@
 
 // import { getAIClient } from "../../config/ai.config.js";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 
 
 
 
-import { groqAIClient } from "../../config/ai.config.js"
- import { jobDescription, resume, selfDescription } from "./temp.js"; 
+import { groqAIClient } from "../../config/ai.config.js";
+import { jobDescription, resume, selfDescription } from "./temp.js";
 
 
 const interviewReportSchema = z.object({
@@ -53,14 +52,14 @@ Self Description:
 ${selfDescription}
 Generate:
 
-- Exactly 10 technical interview questions.
-- Exactly 10 behavioral interview questions.
-- A detailed 14-day preparation plan.
+- upto 10 technical interview questions.
+- upto 10 behavioral interview questions.
+- A detailed skill gap analysis and preparation plan.
 
 Requirements:
-- technicalQuestions must contain exactly 10 objects.
-- behavioralQuestions must contain exactly 10 objects.
-- preparationPlan must contain exactly 14 day objects.
+- technicalQuestions must contain upto or more than  10 objects.
+- behavioralQuestions must contain upto or more than  10 objects.
+- preparationPlan must detailed
 - Each day must have a unique focus.
 - Each day must contain 3-5 practical tasks.
 - The preparation plan should address the candidate's skill gaps and align with the job description.
@@ -147,14 +146,14 @@ export async function main() {
       const response = await generateInterviewReport({ resume, jobDescription, selfDescription });
 
       const content = response.choices[0]?.message?.content;
-      console.log(`AI raw content (attempt ${attempt}):`, content);
+      
 
       let jsonData;
       try {
         jsonData = JSON.parse(content);
       } catch (err) {
         console.warn(`Attempt ${attempt}: AI returned invalid JSON`);
-        throw new Error("AI returned malformed JSON");
+        throw new Error("AI returned malformed JSON", { cause: err });
       }
 
       const parsed = interviewReportSchema.safeParse(jsonData);
@@ -179,12 +178,12 @@ export async function main() {
       }
 
       // success
-      console.log("Validated AI report:", parsed.data);
+      
       return parsed.data;
     } catch (err) {
       lastError = err;
       if (attempt < maxAttempts) {
-        console.log(`Retrying AI generation (attempt ${attempt + 1}/${maxAttempts})...`);
+       
         // small backoff
         await new Promise((r) => setTimeout(r, 1000 * attempt));
         continue;

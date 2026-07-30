@@ -1,10 +1,9 @@
-import { Report } from "./interviewReport.model.js";
-import { User } from "../user/user.model.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { apiResponse } from "../../utils/Api-Response.js";
-import { apiError } from "../../utils/Api-Error.js";
 import { PDFParse } from "pdf-parse";
+import { apiError } from "../../utils/Api-Error.js";
+import { apiResponse } from "../../utils/Api-Response.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import { main } from "./ai.service.js";
+import { Report } from "./interviewReport.model.js";
 
 
 /**
@@ -21,7 +20,7 @@ const createInterviewReport = asyncHandler(async (req, res) => {
         throw new apiError(400, "Job description is required");
     }
     const resumeContent = await (new PDFParse(Uint8Array.from(req.file.buffer))).getText()
-    console.log(resumeContent);
+    
     if(!req.file){
         throw new apiError(400, "Resume is required");
     }
@@ -105,4 +104,4 @@ const deleteReport = asyncHandler(async(req,res)=>{
     .json(
         new apiResponse(200, report, "Report deleted successfully"));
 })
-export { createInterviewReport, getInterviewReportById, getAllInterviewReports,deleteReport };
+export { createInterviewReport, deleteReport, getAllInterviewReports, getInterviewReportById };

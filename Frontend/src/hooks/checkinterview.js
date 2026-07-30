@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useContext,useState} from "react";
 import { interviewContext } from "../contexts/interview.context";
 import { createInterviewReport,getAllInterviewReports,getInterviewReportById,deleteReport } from "@/api/interviewReport.api";
@@ -27,26 +28,27 @@ export const useInterview = () => {
             setReportsloading(false);
         }
     };
-    const handleGetAllInterviewReports = async()=>{ 
-        try {
-            setAllReportsloading(true);
-    
-            const response = await getAllInterviewReports()
-    
-            setInterviewList(response.data);
-    
-            return response;
-        } finally {
-            setAllReportsloading(false);
-        }
-    };
-   const handleGetInterviewReportById = async(id)=>{ 
+
+const handleGetAllInterviewReports = useCallback(async () => {
+  try {
+    setAllReportsloading(true);
+
+    const response = await getAllInterviewReports();
+
+    setInterviewList(response.data);
+
+    return response;
+  } finally {
+    setAllReportsloading(false);
+  }
+}, []);
+   const handleGetInterviewReportById =useCallback( async(id)=>{ 
     try {
         setReportByIdloading(true);
 
         const response =
           await getInterviewReportById(id);
-          console.log("REPORT RESPONSE:", response);
+          
 
         setInterview(response.data);
 
@@ -55,7 +57,7 @@ export const useInterview = () => {
     } finally {
         setReportByIdloading(false);
     }
-};
+}, []);
 
 const deleteInterviewReport = async(id) => {
     try {

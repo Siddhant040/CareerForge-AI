@@ -1,24 +1,23 @@
-import React from 'react'
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { useAuth } from "@/hooks/checkAuth";
 import {
   Code2,
-  MessageSquare,
-  Map,
-  Download,
-  User,
-  LogOut,
   Loader2,
+  LogOut,
+  Map,
+  MessageSquare,
+  User
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/checkAuth";
 
 import { useInterview } from "@/hooks/checkinterview";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import{toast} from "sonner"
 
 import {
   Accordion,
@@ -31,16 +30,19 @@ function Report() {
   const { id } = useParams();
 
   const {
-    interview, getReportByIdloading, handleGetInterviewReportById, } = useInterview();
+    interview, handleGetInterviewReportById, } = useInterview();
 
   const [activeTab, setActiveTab] =
     useState("technical");
 
+    
+
+
   useEffect(() => {
-    if (id) {
-      handleGetInterviewReportById(id);
-    }
-  }, [id]);
+  if (id) {
+    handleGetInterviewReportById(id);
+  }
+}, [id, handleGetInterviewReportById]);
 
   const navigate = useNavigate();
   const { user, handleLogout, logoutLoading } = useAuth();
@@ -48,6 +50,7 @@ function Report() {
   const LoggingOut = async () => {
     try {
       const response = await handleLogout();
+      toast.success(response.message);
       navigate("/login");
     } catch (error) {
       console.error(error);
@@ -189,10 +192,7 @@ function Report() {
             </div>
           </div>
 
-          <Button className="bg-rose-600 hover:bg-rose-700">
-            <Download className="mr-2 h-4 w-4" />
-            Download Resume
-          </Button>
+          
         </aside>
 
         {/* CENTER CONTENT */}

@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
 import {
   FileText,
-  Upload,
-  Sparkles,
-  History,
-  User,
-  LogOut,
   Loader2,
+  LogOut,
+  Sparkles,
+  Upload,
+  User
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,7 +42,7 @@ export default function Dashboard() {
       navigate("/login");
 
     } catch (error) {
-      console.log("Full Error:", error);
+     
       toast.error(
         error.response?.data?.message ||
         "Something went wrong while logging out"
@@ -105,19 +104,19 @@ export default function Dashboard() {
   /**
   * @description this function is used to get the list of all interview reports
   */
-  const { interviewList, handleGetAllInterviewReports, getallReportsloading } = useInterview();
+  const { interviewList, handleGetAllInterviewReports } = useInterview();
   useEffect(() => {
     handleGetAllInterviewReports();
-  }, []);
+  }, [handleGetAllInterviewReports]);
 
-  const { deleteInterviewReport, deleteReportloading } = useInterview();
+  const { deleteInterviewReport } = useInterview();
   const handleDeleteReport = async (id) => {
     try {
       const response = await deleteInterviewReport(id);
       toast.success(response.message);
       handleGetAllInterviewReports();
     } catch (error) {
-      console.log("Full Error:", error);
+     
       toast.error(
         error.response?.data?.message ||
         "Something went wrong while deleting report"

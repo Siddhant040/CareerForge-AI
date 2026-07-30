@@ -1,8 +1,7 @@
-import React from 'react'
-import AppRoutes from './routes/AppRoutes'
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from './contexts/auth.context';
 import { InterviewProvider } from './contexts/interview.context';
+import AppRoutes from './routes/AppRoutes';
 
 export default function App() {
   return (

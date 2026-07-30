@@ -40,7 +40,7 @@ export default function Register() {
             
             
         } catch (error) {
-            console.log("Full Error:", error);
+           
             toast.error(
 
                 error?.response?.data?.message || "Something went wrong"
