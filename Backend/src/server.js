@@ -13,6 +13,12 @@ const PORT = process.env.PORT || 5000;
 
 console.log("D. Connecting MongoDB");
 
+console.log("PORT from env:", process.env.PORT);
+console.log("PORT variable:", PORT);
+
+
+
+
 connectDB()
   .then(() => {
     console.log("E. Mongo Connected");
