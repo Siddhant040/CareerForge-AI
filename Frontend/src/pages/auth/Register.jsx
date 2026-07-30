@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/checkAuth";
 
 export default function Register() {
+    const navigate = useNavigate();
     const {handleRegister,registerLoading} = useAuth();
     const [formData, setFormData] = useState({
         name: "",
@@ -28,16 +30,19 @@ export default function Register() {
         try {
            const response = await handleRegister(formData);
             toast.success(response.message);
+            navigate("/login");
             
             setFormData({
                 name: "",
                 email: "",
                 password: "",
             });
-            i
+            
             
         } catch (error) {
+            console.log("Full Error:", error);
             toast.error(
+
                 error?.response?.data?.message || "Something went wrong"
             )
             

@@ -103,10 +103,11 @@ function Report() {
           <div className="flex gap-4">
             {user ? (
               <>
-                <Button variant="ghost" onClick={() => navigate("/profile")}> 
-                  <User className=" h-4 w-4" />
-                  Profile
-                </Button>
+                
+                <div className=" text-white  flex items-center gap-2 rounded-md px-2 py-1">
+                  <User className=" bg-white text-black rounded-2xl  h-6 w-6" />
+                  {user.name}
+                </div>
 
                 <Button
                   disabled={logoutLoading}

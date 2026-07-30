@@ -8,9 +8,9 @@ import ProtectedRoute from "@/components/protectedroutes/ProtectedAuthRoutes.jsx
 function AppRoutes() {
     return (
         <Routes>
+            <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Home />} />
             <Route
                 path="/dashboard"
                 element={
