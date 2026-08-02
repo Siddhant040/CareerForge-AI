@@ -6,9 +6,9 @@ import { BlacklistedToken, User } from "./user.model.js";
 import { apiError } from "../../utils/Api-Error.js";
 
 const getCookieOptions = () => ({
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
 });
 
 const generateAccessAndRefreshTokens = async (userId) => {
