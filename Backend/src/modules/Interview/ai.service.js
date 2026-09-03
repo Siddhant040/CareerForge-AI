@@ -8,7 +8,7 @@ import { z } from "zod";
 
 
 import { groqAIClient } from "../../config/ai.config.js";
-import { jobDescription, resume, selfDescription } from "./temp.js";
+
 
 
 const interviewReportSchema = z.object({
@@ -52,8 +52,8 @@ Self Description:
 ${selfDescription}
 Generate:
 
-- upto 10 technical interview questions.
-- upto 10 behavioral interview questions.
+- Generate exactly 10 technical interview questions.
+- Generate exactly 10 behavioral interview questions.
 - A detailed skill gap analysis and preparation plan.
 
 Requirements:
@@ -64,6 +64,15 @@ Requirements:
 - Each day must contain 3-5 practical tasks.
 - The preparation plan should address the candidate's skill gaps and align with the job description.
 - Do not generate fewer or more than the required number of items.
+
+IMPORTANT FACTUAL ACCURACY RULES:
+
+- Use only information explicitly provided in the Resume and Self Description.
+- Never invent the candidate's skills, projects, companies, education, certifications, or work experience.
+- Do not treat a skill mentioned in the Job Description as a skill possessed by the candidate.
+- Clearly distinguish between the candidate's existing skills and the skills required by the job.
+- If information is missing, do not guess. Treat it as unknown.
+- Skill gaps must be based on a comparison between the candidate's provided information and the Job Description.
 
 
 Return ONLY valid JSON matching:
@@ -118,7 +127,7 @@ No explanations.
 `;
 
   return groqAIClient().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+    model: "openai/gpt-oss-120b",
     max_tokens: 8192,
       response_format: {
     type: "json_object"
@@ -137,7 +146,11 @@ No explanations.
   });
 }
 
-export async function main() {
+export async function main({
+  resume,
+  jobDescription,
+  selfDescription
+} = {}) {
   const maxAttempts = 3;
   let lastError = null;
 
