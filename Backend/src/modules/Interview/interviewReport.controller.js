@@ -4,6 +4,7 @@ import { apiResponse } from "../../utils/Api-Response.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { Report } from "./interviewReport.model.js";
 import { generateInterviewPipeline } from "./services/ai/ai.service.js";
+import { generateInterviewReportPdf } from "./services/pdf/reportPdf.service.js";
 
 
 /**
@@ -124,5 +125,39 @@ const deleteReport = asyncHandler(async (req, res) => {
     .json(
       new apiResponse(200, report, "Report deleted successfully"));
 })
-export { createInterviewReport, deleteReport, getAllInterviewReports, getInterviewReportById };
+
+/**
+ * @desc Download interview report as PDF
+ */
+const downloadInterviewReport = asyncHandler(async (req, res) => {
+  const report = await Report.findOne({
+    _id: req.params.id,
+    user: req.user.id,
+  });
+
+  if (!report) {
+    throw new apiError(404, "Report not found");
+  }
+
+  const pdfBuffer = await generateInterviewReportPdf(report);
+
+  const safeTitle = (report.title || "CareerForge-Interview-Report")
+    .replace(/[^a-z0-9-_]/gi, "-")
+    .replace(/-+/g, "-");
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${safeTitle}.pdf"`,
+  );
+  res.setHeader("Content-Length", pdfBuffer.length);
+
+  return res.status(200).send(pdfBuffer);
+});
+export { 
+  downloadInterviewReport, 
+  createInterviewReport,
+   deleteReport, 
+   getAllInterviewReports, 
+   getInterviewReportById };
 

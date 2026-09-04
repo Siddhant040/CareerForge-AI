@@ -9,7 +9,8 @@ import {
   LogOut,
   Map,
   MessageSquare,
-  User
+  User,
+  Download
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -31,7 +32,9 @@ function Report() {
   const { id } = useParams();
 
   const {
-    interview, handleGetInterviewReportById, } = useInterview();
+    interview, handleGetInterviewReportById, handleDownloadInterviewReport,
+    downloadReportloading,
+  } = useInterview();
 
   const [activeTab, setActiveTab] =
     useState("technical");
@@ -161,6 +164,7 @@ function Report() {
           {/* LEFT SIDEBAR */}
           <aside className="flex w-64 flex-col justify-between border-r border-slate-800 bg-black p-6">
 
+            {/* Sections */}
             <div>
               <p className="mb-6 text-xs uppercase tracking-[0.25em] text-zinc-500">
                 Sections
@@ -171,8 +175,8 @@ function Report() {
                 <button
                   onClick={() => setActiveTab("technical")}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${activeTab === "technical"
-                    ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
-                    : "text-zinc-400 hover:bg-zinc-900"
+                      ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                      : "text-zinc-400 hover:bg-zinc-900"
                     }`}
                 >
                   <Code2 size={18} />
@@ -182,8 +186,8 @@ function Report() {
                 <button
                   onClick={() => setActiveTab("behavioral")}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${activeTab === "behavioral"
-                    ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
-                    : "text-zinc-400 hover:bg-zinc-900"
+                      ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                      : "text-zinc-400 hover:bg-zinc-900"
                     }`}
                 >
                   <MessageSquare size={18} />
@@ -193,8 +197,8 @@ function Report() {
                 <button
                   onClick={() => setActiveTab("roadmap")}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${activeTab === "roadmap"
-                    ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
-                    : "text-zinc-400 hover:bg-zinc-900"
+                      ? "border border-rose-500/20 bg-rose-500/10 text-rose-400"
+                      : "text-zinc-400 hover:bg-zinc-900"
                     }`}
                 >
                   <Map size={18} />
@@ -204,6 +208,30 @@ function Report() {
               </div>
             </div>
 
+            {/* Bottom Download Button */}
+            <Button
+              variant="ghost"
+              onClick={() =>
+                handleDownloadInterviewReport(
+                  id,
+                  interview?.title,
+                )
+              }
+              disabled={downloadReportloading}
+              className="w-full justify-start gap-3 rounded-xl px-4 py-3 text-zinc-300 bg-rose-500 hover:bg-rose-600"
+            >
+              {downloadReportloading ? (
+                <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
+              ) : (
+                <Download className="h-5 w-5 shrink-0" />
+              )}
+
+              <span>
+                {downloadReportloading
+                  ? "Downloading..."
+                  : "Download PDF"}
+              </span>
+            </Button>
 
           </aside>
 

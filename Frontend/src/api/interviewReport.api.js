@@ -48,3 +48,16 @@ export const createInterviewReport = async ({jobDescription,resumeFile,selfDescr
     const response = await api.delete(`/interviewReport/${id}`);
     return response.data;
   };
+  /**
+ * @description Download interview report as PDF
+ */
+export const downloadInterviewReport = async (id) => {
+  const response = await api.get(
+    `/interviewReport/${id}/download`,
+    {
+      responseType: "blob",
+    },
+  );
+
+  return response;
+};
