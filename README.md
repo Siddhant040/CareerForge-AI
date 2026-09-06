@@ -722,73 +722,23 @@ CareerForge AI implements application-level security practices including:
 
 ---
 
-# 📸 Screenshots
+## 📸 Screenshots
 
-Add screenshots of the application here.
+### 🏠 Landing Page
 
-Recommended screenshots:
+![CareerForge AI Landing Page](docs/screenshots/home.png)
 
-### Landing Page
+### 🔐 Login
 
-```text
-Add screenshot here
-```
+![CareerForge AI Login](docs/screenshots/login.png)
 
-### Authentication
+### 📝 Interview Report Generator
 
-```text
-Add screenshot here
-```
+![CareerForge AI Interview Generator](docs/screenshots/dashboard.png)
 
-### Dashboard
+### 🤖 AI Interview Report
 
-```text
-Add screenshot here
-```
-
-### Resume Upload
-
-```text
-Add screenshot here
-```
-
-### Job Description
-
-```text
-Add screenshot here
-```
-
-### AI Interview Report
-
-```text
-Add screenshot here
-```
-
-### Match Score
-
-```text
-Add screenshot here
-```
-
-### Skill Gap Analysis
-
-```text
-Add screenshot here
-```
-
-### Preparation Roadmap
-
-```text
-Add screenshot here
-```
-
-### PDF Report
-
-```text
-Add screenshot here
-```
-
----
+![CareerForge AI Interview Report](docs/screenshots/report.png)
 
 # 📈 Key Engineering Concepts Demonstrated
 
