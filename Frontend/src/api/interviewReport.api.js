@@ -7,11 +7,7 @@ import api from "./axios";
  */
 export const createInterviewReport = async ({jobDescription,resumeFile,selfDescription}) => {
   const formData = new FormData();
-  console.log({
-  resumeFile,
-  jobDescription,
-  selfDescription,
-});
+
   formData.append("jobDescription", jobDescription);
   formData.append("resume", resumeFile);
   formData.append("selfDescription", selfDescription);

@@ -12,13 +12,9 @@ import { generateInterviewReportPdf } from "./services/pdf/reportPdf.service.js"
  */
 
 const createInterviewReport = asyncHandler(async (req, res) => {
-  console.log(
-    "🔥 CREATE INTERVIEW REPORT CALLED",
-    new Date().toISOString(),
-  );
+ 
   const { selfDescription, jobDescription } = req.body;
-  console.log("BODY:", req.body);
-  console.log("FILE:", req.file?.originalname);
+ 
 
   if (!selfDescription?.trim()) {
     throw new apiError(400, "Self description is required");
